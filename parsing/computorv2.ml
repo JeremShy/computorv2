@@ -1,8 +1,7 @@
 # 1 "parsing/computorv2.mll"
  
 
-
-# 6 "parsing/computorv2.ml"
+# 5 "parsing/computorv2.ml"
 let __ocaml_lex_tables = {
   Lexing.lex_base =
    "\000\000\252\255\253\255\018\000\027\000\254\255\102\000";
@@ -122,33 +121,33 @@ and __ocaml_lex_token_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 let
-# 6 "parsing/computorv2.mll"
+# 5 "parsing/computorv2.mll"
                    word
-# 128 "parsing/computorv2.ml"
+# 127 "parsing/computorv2.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 7 "parsing/computorv2.mll"
+# 6 "parsing/computorv2.mll"
   (print_endline word ; token lexbuf)
-# 132 "parsing/computorv2.ml"
+# 131 "parsing/computorv2.ml"
 
   | 1 ->
-# 9 "parsing/computorv2.mll"
+# 8 "parsing/computorv2.mll"
   (token lexbuf)
-# 137 "parsing/computorv2.ml"
+# 136 "parsing/computorv2.ml"
 
   | 2 ->
 let
-# 10 "parsing/computorv2.mll"
+# 9 "parsing/computorv2.mll"
         c
-# 143 "parsing/computorv2.ml"
+# 142 "parsing/computorv2.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 10 "parsing/computorv2.mll"
+# 9 "parsing/computorv2.mll"
           (token lexbuf)
-# 147 "parsing/computorv2.ml"
+# 146 "parsing/computorv2.ml"
 
   | 3 ->
-# 11 "parsing/computorv2.mll"
+# 10 "parsing/computorv2.mll"
        (raise End_of_file)
-# 152 "parsing/computorv2.ml"
+# 151 "parsing/computorv2.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_token_rec lexbuf __ocaml_lex_state
