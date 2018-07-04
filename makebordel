@@ -2,9 +2,34 @@
 Lex/yacc ou non ?
 
 
-Notation polonaise inverse ?
+
+Resolution d'un calcul :
+
+Par exemple : f (p(x + 1 + varA)) + j(x) ->
+	Resolution des globales : on remplace varA par sa valeur, par exemple 3
+
+	Transformation en rpn : x1+3+[p][f]xj+
+	Calcul de gauche a droite de la rpn
+
+Etapes de la transformation en rpn :
+	On commence par rajouter des parentheses autour de tous les operateurs prioritaires et leurs parametres *, **, /, % :
+	ALGO add_parentheses(str, i):
+		Si on trouve un operateur,
+			On regarde le plus proche symbole a gauche :
+				si c'est une parenthese fermante, on trouve la parenthese ouvrante qui lui correspond. Ceci est le premier terme de l'operation
+				Si c'est un nombre reel ou imaginaire, alors c'est le premier terme de l'operation
+				sinon, c'est une erreur syntaxique
+			On fait pareil a droite, en inversant les mots "fermante" par "ouvrante"
+			On renvoit f(strAvantPremierTerme + '(' + premierTerme + operateur + add_parentheses(deuxiemeTerme, 0) + ')' + strApresParenthese, indexApresParenthese)
+		Si on trouve un nombre reel ou imaginaire, ou un operateur non prioritaire :
+			On renvoit add_parentheses(str, i + 1)
+		Si on est en fin de chaine
+			On renvoit str
 
 
+	[a-zA-Z]+\( -> Il s'agit d'une fonction. on trouve la parenthese matchant, puis par exemple avec e l'expression dans les parentheses, on ecrit - polonaise_me(e) + '[ + 'functionName' + ']' + polonaise_me(suite apres la parenthese qui match)
+	\( -> Il s'agit de parentheses de prioritée. On trouve la parenthese matchante, puis on ecrit avec e l'expressiond ans les parentheses : e + polonaise_me(suite apres la parenthese qui match)
+	operateur :
 
 
 À gérer :
@@ -24,7 +49,7 @@ Inférence de type :
 x=2 // 2 est un int donc x est un int
 y=x // x est un int donc y est un int
 y=7 // 7 est un in donc y est un int
-y=2*i-4 // i est un imaginaire donc y 2i aussi, donc 2i - 4 aussi, donc y aussi
+y=2*i-4 // i est un imaginaire donc 2i aussi, donc 2i - 4 aussi, donc y aussi
 
 
 // On voit que les variables sont toutes globales
@@ -39,8 +64,15 @@ operateurs :
 **	// multiplication matricielle
 *	// multiplication terme à terme de deux matrices ou d’un scalaire et d’une matrice
 ^	// puissances entieres et ≥ 0
+
+Syboles:
 ()	// toutes les prioritées notamment les parenthèses
+=
+?
+;
+,
 a = ? // permet d'avoir la valeur d'une variable ou d'une fonction definie dans le contexte en cours
+
 
 calculs:
 a + 2 = ?
@@ -52,5 +84,7 @@ funA(x) = x^2 + 2x + 1
 y = 0
 funA(x) = y ?
 
-Syntax des matrices:
+Syntaxe des matrices:
 [[A0,0, A0,1, ...]; [A1,0, A1,1, ...]; ...] // , entre les colonnes et ; entre les lignes
+
+Les noms variables et de fonctions sont insensibles à la casse. Aucune variabe ou fonction ne peut s'appeler i.
