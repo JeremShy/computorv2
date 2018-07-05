@@ -1,5 +1,5 @@
 RESULT = computorv2
-SOURCES = src/types.ml src/utils.ml src/lexeme.ml src/lexer.ml src/parser.ml src/main.ml
+SOURCES = src/types.ml src/utils.ml src/lexeme.ml src/lexer.ml src/nbr.ml src/operator.ml src/parser.ml src/main.ml
 LIBS=Str
 OCAMLMAKEFILE = OCamlMakefile
 

@@ -94,4 +94,4 @@ let rec lexer str =
 		| None ->
 	match startsWithOperator str with
 		| Some(matched, en) -> (new Lexeme.lexeme matched Types.Operator) :: (lexer en)
-		| None -> raise Types.Parser_error
+		| None -> raise Types.Lexer_error
