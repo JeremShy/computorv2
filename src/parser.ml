@@ -3,9 +3,15 @@
 	There can't be any symbol in this list, but there can be operators.
 *)
 
-let get_prioritary_operator lexeme =
-	if (lexeme#get_type = Types.Operator) &&
-		(lexeme#get_content = "*" || lexeme#get_content = "**" || lexeme#get_content = "/" || lexeme#get_content = "%" || lexeme#get_content = "^")
+let get_operator_priority lexeme =
+	if (lexeme#get_type <> Types.Operator) then
+		raise (Invalid_argument "get_operator_priority: This lexeme isn't an operator")
+	else if lexeme#get_content = "*" || lexeme#get_content = "**" || lexeme#get_content = "/" || lexeme#get_content = "%" then
+		1
+	else if lexeme#get_content = "^" then
+		2
+	else
+		0
 
 
 let count_equals_symbols lst =
@@ -28,8 +34,12 @@ let get_lvalue_and_rvalue lst =
 	in
 	recu lst [] [] true
 
-let polonaise_me lst =
-	[]
+let polonaise_me lexemes =
+	let rec recu lexemes op_buffer =
+		()
+	in
+	recu lexemes []
+
 
 let parser lexemes =
 	if count_equals_symbols lexemes <> 1 then

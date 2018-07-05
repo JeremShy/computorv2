@@ -4,6 +4,7 @@ let rec computorv2 () =
 	let lexed_line = Lexer.lexer line in
 	Utils.print_lex_lst lexed_line ;
 	let parsed_line = Parser.parser lexed_line in
+	ignore parsed_line ;
 	computorv2 ()
 
 let () =
