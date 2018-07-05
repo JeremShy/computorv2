@@ -1,5 +1,10 @@
 
-Lex/yacc ou non ?
+
+3 syntaxes principales :
+
+1: var = expression OU f(x) = expression	// Assignation d'un nouveau definissable
+2: var = ?									// Affichage de la valeur d'un définissable
+3: f(x) = y ?								// Resolution d'équation
 
 
 
