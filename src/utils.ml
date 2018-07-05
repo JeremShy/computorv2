@@ -6,6 +6,7 @@ let lex_type_to_string = function
 	| Types.RealFloat -> "RealFloat"
 	| Types.IMultipleInteger -> "IMultipleInteger"
 	| Types.IMultipleFloat -> "IMultipleFloat"
+	| Types.FunctionBeginning -> "FunctionBeginning"
 
 let print_lex_lst lst =
-	List.iter (fun x -> Printf.printf "%s - " x#to_string) lst ; print_char '\n'
+	List.iter (fun x -> Printf.printf "\t%s\n" x#to_string) lst ; print_char '\n'

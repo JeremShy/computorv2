@@ -4,3 +4,5 @@ LIBS=Str
 OCAMLMAKEFILE = OCamlMakefile
 
 -include $(OCAMLMAKEFILE)
+
+re: clean bc

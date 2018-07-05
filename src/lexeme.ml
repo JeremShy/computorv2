@@ -6,5 +6,5 @@ class lexeme (content:string) (p_type:Types.lex_type) =
 		method get_content = _content
 		method get_type = _type
 		method to_string = "[lexeme: (_content=" ^ _content ^ "),(_type=" ^ (Utils.lex_type_to_string _type) ^ ")]"
-		initializer Printf.printf "Creating object [%s]\n" s#to_string
+		(* initializer Printf.printf "Creating object with content = [%s] and type = %s\n" content (Utils.lex_type_to_string _type) *)
 	end
