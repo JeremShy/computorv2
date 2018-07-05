@@ -34,11 +34,67 @@ let get_lvalue_and_rvalue lst =
 	in
 	recu lst [] [] true
 
-let polonaise_me lexemes =
-	let rec recu lexemes op_buffer =
-		()
+let create_elem_from_lex_nbr = function
+	| hd when hd#get_type = Types.IMultipleFloat	->	Entity.Nbr(Nbr.IMultipleFloat(float_of_string hd#get_content))
+	| hd when hd#get_type = Types.IMultipleInteger	->	Entity.Nbr(Nbr.IMultipleInteger(int_of_string hd#get_content))
+	| hd when hd#get_type = Types.RealFloat			->	Entity.Nbr(Nbr.RealFloat(float_of_string hd#get_content))
+	| hd when hd#get_type = Types.RealInteger		->	Entity.Nbr(Nbr.RealInteger(int_of_string hd#get_content))
+	| _ -> raise (Invalid_argument "create_elem_from_lex_nbr: argument is not a numeric lexeme")
+
+let get_max_priority operator_lst =
+	let rec recu operator_lst maxi =
+		match operator_lst with
+		| hd::tail -> if get_operator_priority hd > maxi then recu tail (get_operator_priority hd) else recu tail maxi
+		| [] -> maxi
 	in
-	recu lexemes []
+	recu operator_lst 0
+
+(* Returns a pair containing the next group, and the rest of the list *)
+let get_next_group lst : (Lexeme.lexeme list * Lexeme.lexeme list) =
+	let rec recu lst buffer lvl =
+		match lst with
+		| hd::tail when ((hd#get_type = Types.Symbole && hd#get_content = "(") || (hd#get_type = Types.FunctionBeginning)) ->
+			if (lvl = 0) then
+				recu tail [] 1
+			else
+				recu tail (buffer @ [hd]) (lvl + 1)
+		| hd::tail when  (hd#get_type = Types.Symbole && hd#get_content = ")") ->
+			if (lvl = 1) then
+				(buffer, tail)
+			else if (lvl = 0) then
+				raise (Invalid_argument "get_next_group: wtf")
+			else
+				recu tail (buffer @ [hd]) (lvl - 1)
+		| hd::tail -> if lvl = 0 then ([hd], tail) else recu tail (buffer @ [hd]) lvl
+		| [] -> raise (Invalid_argument "Unexpected end of string")
+	in
+	recu lst [] 0
+
+let rec convert_op_buffer = function
+	| hd::tail when hd#get_type <> Types.Operator -> raise (Invalid_argument "convert_op_buffer")
+	| hd::tail when hd#get_content = "+" -> Entity.Operator(Operator.Addition)::(convert_op_buffer tail)
+	| hd::tail when hd#get_content = "-" -> Entity.Operator(Operator.Substraction)::(convert_op_buffer tail)
+	| hd::tail when hd#get_content = "/" -> Entity.Operator(Operator.Division)::(convert_op_buffer tail)
+	| hd::tail when hd#get_content = "*" -> Entity.Operator(Operator.Multiplication)::(convert_op_buffer tail)
+	| hd::tail when hd#get_content = "^" -> Entity.Operator(Operator.Power)::(convert_op_buffer tail)
+	| hd::tail when hd#get_content = "**" -> Entity.Operator(Operator.MatrixMultiplication)::(convert_op_buffer tail)
+	| hd::tail -> raise (Invalid_argument ("convert_op_buffer 2 -- " ^ hd#get_content))
+	| [] -> []
+
+let rec polonaise_me lexemes =
+	let rec recu lexemes op_buffer ret_buffer =
+		match lexemes with
+		| hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat
+						||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> recu tl op_buffer (ret_buffer @ [create_elem_from_lex_nbr hd])
+		| hd::tl when hd#get_type = Types.Operator -> if (get_operator_priority hd > get_max_priority op_buffer) then
+														let (next_group, fin) = get_next_group tl in
+														ret_buffer @ (polonaise_me next_group) @ (convert_op_buffer (hd::op_buffer)) @ polonaise_me fin
+													else
+														recu tl (op_buffer @ [hd]) ret_buffer
+		| [] -> ret_buffer @ convert_op_buffer op_buffer
+		| _ -> raise (Invalid_argument "Not yet handled")
+	in
+	recu lexemes [] []
 
 
 let parser lexemes =
@@ -48,4 +104,5 @@ let parser lexemes =
 		let (lvalue, rvalue) = get_lvalue_and_rvalue lexemes in
 	print_endline "lvalue : " ; Utils.print_lex_lst lvalue ;
 	print_endline "rvalue : " ; Utils.print_lex_lst rvalue ;
-	(polonaise_me lvalue, polonaise_me rvalue)
+	let (r, l) = (polonaise_me lvalue,  rvalue) in
+	Utils.print_entity_lst r

@@ -1,3 +1,3 @@
-type operator = Addition | ScalarMultiplication | Substraction | Modulo | Division
-					| MatrixMultiplication | ScalarMatrixMultiplication | MatrixMatrixMultiplication
+type operator = Addition | Multiplication | Substraction | Modulo | Division | Power
+					| MatrixMultiplication
 					| FunctionApplication
