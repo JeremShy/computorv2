@@ -9,4 +9,5 @@ let lex_type_to_string = function
 	| Types.FunctionBeginning -> "FunctionBeginning"
 
 let print_lex_lst lst =
-	List.iter (fun x -> Printf.printf "\t%s\n" x#to_string) lst ; print_char '\n'
+	print_newline () ;
+	List.iter (fun x -> print_endline x#to_string) lst ; print_newline ()
