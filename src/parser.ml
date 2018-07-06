@@ -82,19 +82,20 @@ let rec convert_op_buffer = function
 	| [] -> []
 
 let rec polonaise_me lexemes =
-	let rec recu lexemes op_buffer ret_buffer =
+	let rec recu lexemes op_buffer ret_buffer expecting_operator =
 		match lexemes with
 		| hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat
-						||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> recu tl op_buffer (ret_buffer @ [create_elem_from_lex_nbr hd])
+						||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> recu tl op_buffer (ret_buffer @ [create_elem_from_lex_nbr hd]) true
+		(* | hd::tl when hd#get_type = Types.String *)
 		| hd::tl when hd#get_type = Types.Operator -> if (get_operator_priority hd > get_max_priority op_buffer) then
 														let (next_group, fin) = get_next_group tl in
 														ret_buffer @ (polonaise_me next_group) @ (convert_op_buffer (hd::op_buffer)) @ polonaise_me fin
 													else
-														recu tl (op_buffer @ [hd]) ret_buffer
+														recu tl (op_buffer @ [hd]) ret_buffer false
 		| [] -> ret_buffer @ convert_op_buffer op_buffer
 		| _ -> raise (Invalid_argument "Not yet handled")
 	in
-	recu lexemes [] []
+	recu lexemes [] [] false
 
 
 let parser lexemes =
