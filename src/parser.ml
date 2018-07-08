@@ -9,7 +9,9 @@ let get_operator_priority lexeme =
 	else if lexeme#get_content = "*" || lexeme#get_content = "**" || lexeme#get_content = "/" || lexeme#get_content = "%" then
 		1
 	else if lexeme#get_content = "^" then
-		2
+   2
+ else if lexeme#get_content = "$" then
+    3
 	else
 		0
 
@@ -50,7 +52,7 @@ let get_max_priority operator_lst =
 	recu operator_lst 0
 
 (* Returns a pair containing the next group, and the rest of the list *)
-let get_next_group lst : (Lexeme.lexeme list * Lexeme.lexeme list) =
+let get_next_group (lst:Lexeme.lexeme list) : (Lexeme.lexeme list * Lexeme.lexeme list) =
 	let rec recu lst buffer lvl =
 		match lst with
 		| hd::tail when ((hd#get_type = Types.Symbole && hd#get_content = "(") || (hd#get_type = Types.FunctionBeginning)) ->
@@ -77,24 +79,40 @@ let rec convert_op_buffer = function
 	| hd::tail when hd#get_content = "/" -> Entity.Operator(Operator.Division)::(convert_op_buffer tail)
 	| hd::tail when hd#get_content = "*" -> Entity.Operator(Operator.Multiplication)::(convert_op_buffer tail)
 	| hd::tail when hd#get_content = "^" -> Entity.Operator(Operator.Power)::(convert_op_buffer tail)
-	| hd::tail when hd#get_content = "**" -> Entity.Operator(Operator.MatrixMultiplication)::(convert_op_buffer tail)
+  | hd::tail when hd#get_content = "**" -> Entity.Operator(Operator.MatrixMultiplication)::(convert_op_buffer tail)
+  | hd::tail when hd#get_content = "$" -> Entity.Operator(Operator.FunctionApplication)::(convert_op_buffer tail)
 	| hd::tail -> raise (Invalid_argument ("convert_op_buffer 2 -- " ^ hd#get_content))
 	| [] -> []
 
 let rec polonaise_me lexemes =
-	let rec recu lexemes op_buffer ret_buffer expecting_operator =
-		match lexemes with
-		| hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat
-						||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> recu tl op_buffer (ret_buffer @ [create_elem_from_lex_nbr hd]) true
-		(* | hd::tl when hd#get_type = Types.String *)
-		| hd::tl when hd#get_type = Types.Operator -> if (get_operator_priority hd > get_max_priority op_buffer) then
-														let (next_group, fin) = get_next_group tl in
-														ret_buffer @ (polonaise_me next_group) @ (convert_op_buffer (hd::op_buffer)) @ polonaise_me fin
-													else
-														recu tl (op_buffer @ [hd]) ret_buffer false
-		| [] -> ret_buffer @ convert_op_buffer op_buffer
-		| _ -> raise (Invalid_argument "Not yet handled")
-	in
+  let rec recu lexemes op_buffer ret_buffer expecting_operator =
+    if (expecting_operator = false) then
+      begin
+     match lexemes with
+  		| hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat
+                  ||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> recu tl op_buffer (ret_buffer @ [create_elem_from_lex_nbr hd]) true
+      | hd::tl when hd#get_type = Types.String -> recu tl op_buffer (ret_buffer @ [Variable(hd#get_content)]) true
+      | hd::tl when hd#get_type = Types.FunctionBeginning ->
+          let (next_group, fin) = get_next_group (hd::tl) in
+          recu fin op_buffer (ret_buffer@((Entity.Func(new Func.func hd#get_content))::((polonaise_me next_group) @ [Entity.Operator(Operator.FunctionApplication)]))) true
+      | hd::tl when hd#get_type = Types.Symbole && hd#get_content = "(" ->
+        let (next_group, fin) = get_next_group (hd::tl) in
+        recu fin op_buffer (ret_buffer@(polonaise_me next_group)) true
+      | []  -> raise (Types.Parser_error "Expected symbol 1")
+      | hd::tl   -> raise (Types.Parser_error ("Expected symbol 2 " ^ (hd#to_string)))
+   end
+    else
+      begin
+        match lexemes with
+        | hd::tl when hd#get_type = Types.Operator ->
+          if (get_operator_priority hd < get_max_priority op_buffer) then
+            recu tl [hd] (ret_buffer  @ (convert_op_buffer op_buffer)) false
+          else
+            recu tl (hd::op_buffer) ret_buffer false
+        | [] -> ret_buffer @ convert_op_buffer op_buffer
+        | _ -> raise (Invalid_argument "Expected operator")
+      end
+  in
 	recu lexemes [] [] false
 
 

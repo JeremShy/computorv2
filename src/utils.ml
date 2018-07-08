@@ -32,6 +32,8 @@ let rec print_entity_lst lst =
 								| Power -> print_string "^"
 								| MatrixMultiplication -> print_string "**"
 								| FunctionApplication -> print_string "$"
-							end ; print_entity_lst tl
+                          end ; print_entity_lst tl
+  | Variable(name)::tl -> print_string name ; print_entity_lst tl
+  | Func(f)::tl -> print_string f#get_name ; print_entity_lst tl
 	| [] -> print_newline ()
 	| _ -> raise (Invalid_argument "Not yet handled")
