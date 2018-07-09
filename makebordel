@@ -81,8 +81,8 @@ a = ? // permet d'avoir la valeur d'une variable ou d'une fonction definie dans 
 
 calculs:
 a + 2 = ?
-funB(x) = ?
-funA(x) + funB(x) = ?
+funB(n) = ?
+funA(n) + funB(m) = ?
 
 calculs de racines de polynomes de degré ≤ 2:
 funA(x) = x^2 + 2x + 1
