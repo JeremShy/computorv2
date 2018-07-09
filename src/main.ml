@@ -4,7 +4,12 @@ let rec computorv2 () =
 	let lexed_line = Lexer.lexer line in
 	Utils.print_lex_lst lexed_line ;
 	let parsed_line = Parser.parser lexed_line in
-	ignore parsed_line ;
+	begin
+		match parsed_line with
+		| Entity.FunctionDefinition (name, parameter, expr) -> print_endline ("Defining function " ^ name ^ " with variable " ^ parameter ^ " and expression : ") ; Utils.print_entity_lst expr
+		| Entity.VariableDefinition (name, expr) -> print_endline ("Defining variable " ^ name ^ " = "); Utils.print_entity_lst expr
+		| _ -> print_endline "Not yet handled"
+	end ;
 	computorv2 ()
 
 let () =

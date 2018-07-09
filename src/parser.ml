@@ -79,8 +79,8 @@ let rec convert_op_buffer = function
 	| hd::tail when hd#get_content = "/" -> Entity.Operator(Operator.Division)::(convert_op_buffer tail)
 	| hd::tail when hd#get_content = "*" -> Entity.Operator(Operator.Multiplication)::(convert_op_buffer tail)
 	| hd::tail when hd#get_content = "^" -> Entity.Operator(Operator.Power)::(convert_op_buffer tail)
-  | hd::tail when hd#get_content = "**" -> Entity.Operator(Operator.MatrixMultiplication)::(convert_op_buffer tail)
-  | hd::tail when hd#get_content = "$" -> Entity.Operator(Operator.FunctionApplication)::(convert_op_buffer tail)
+  	| hd::tail when hd#get_content = "**" -> Entity.Operator(Operator.MatrixMultiplication)::(convert_op_buffer tail)
+  	| hd::tail when hd#get_content = "$" -> Entity.Operator(Operator.FunctionApplication)::(convert_op_buffer tail)
 	| hd::tail -> raise (Invalid_argument ("convert_op_buffer 2 -- " ^ hd#get_content))
 	| [] -> []
 
@@ -94,7 +94,7 @@ let rec polonaise_me lexemes =
       | hd::tl when hd#get_type = Types.String -> recu tl op_buffer (ret_buffer @ [Variable(hd#get_content)]) true
       | hd::tl when hd#get_type = Types.FunctionBeginning ->
           let (next_group, fin) = get_next_group (hd::tl) in
-          recu fin op_buffer (ret_buffer@((Entity.Func(new Func.func hd#get_content))::((polonaise_me next_group) @ [Entity.Operator(Operator.FunctionApplication)]))) true
+          recu fin op_buffer (ret_buffer@((Entity.Func(hd#get_content))::((polonaise_me next_group) @ [Entity.Operator(Operator.FunctionApplication)]))) true
       | hd::tl when hd#get_type = Types.Symbole && hd#get_content = "(" ->
         let (next_group, fin) = get_next_group (hd::tl) in
         recu fin op_buffer (ret_buffer@(polonaise_me next_group)) true
@@ -115,6 +115,20 @@ let rec polonaise_me lexemes =
   in
 	recu lexemes [] [] false
 
+let is_function_definition lvalue rvalue = match lvalue with
+	| fbeg::variable_name::closing_par::[] when fbeg#get_type = Types.FunctionBeginning
+											&& variable_name#get_type = Types.String
+											&& closing_par#get_type = Types.Symbole && closing_par#get_content = ")" ->
+		begin
+			match rvalue with
+			| inter::[] when inter#get_type = Types.Symbole && inter#get_content = "?" -> None
+			| _ -> Some(fbeg#get_content, variable_name#get_content)
+		end
+	| _ -> None
+
+let is_variable_definition lvalue rvalue = match lvalue with
+	| variable_name::[] when variable_name#get_type = Types.String -> Some(variable_name#get_content)
+	| _ -> None
 
 let parser lexemes =
 	if count_equals_symbols lexemes <> 1 then
@@ -123,5 +137,11 @@ let parser lexemes =
 		let (lvalue, rvalue) = get_lvalue_and_rvalue lexemes in
 	print_endline "lvalue : " ; Utils.print_lex_lst lvalue ;
 	print_endline "rvalue : " ; Utils.print_lex_lst rvalue ;
-	let (r, l) = (polonaise_me lvalue,  rvalue) in
-	Utils.print_entity_lst r
+	match is_function_definition lvalue rvalue with
+	| Some (function_name, variable_name) -> Entity.FunctionDefinition (function_name, variable_name, polonaise_me rvalue)
+	| None ->
+	match is_variable_definition lvalue rvalue with
+	| Some (variable_name) -> Entity.VariableDefinition(variable_name, polonaise_me rvalue)
+	| None -> raise (Types.Parser_error "Not yet handled")
+	(* let (r, l) = (polonaise_me lvalue,  rvalue) in
+	Utils.print_entity_lst r *)
