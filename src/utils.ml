@@ -21,6 +21,7 @@ let rec print_entity_lst lst =
 									| IMultipleFloat x -> print_float x ; print_char 'i'
 									| IMultipleInteger x -> print_int x ; print_char 'i'
 									| Matrix m -> raise (Invalid_argument "Not yet handled")
+									| ComplexNbr c -> print_string (c#describe)
 								end ; print_entity_lst tl
 	| Operator(elem)::tl -> begin
 								match elem with
