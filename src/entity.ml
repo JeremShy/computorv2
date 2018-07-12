@@ -12,4 +12,4 @@ type operation_type = FunctionDefinition of (string * variable * expression)	(* 
 						| ExpressionSolving of expression						(* a + 2 = ? ou f(2) = ? *)
 						| EquationSolving of (string * Nbr.nbr)				(* Function name,  Value to be equal to *)
 
-type bufferable = Func of func | Operator of Operator.operator | Nbr of Nbr.nbr
+type bufferable = Func of func | Nbr of Nbr.nbr
