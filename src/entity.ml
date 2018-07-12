@@ -4,7 +4,6 @@ type entity = Nbr of Nbr.nbr | Func of func | Operator of Operator.operator | Va
 
 type definable = Func of func | Variable of Nbr.nbr
 
-
 type expression = entity list (* Polonaised list of entities *)
 
 type operation_type = FunctionDefinition of (string * variable * expression)	(* Function name, function parameter, function definition *)
