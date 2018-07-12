@@ -2,6 +2,9 @@ let rec lexer str =
 	let strWithoutFirstN str n =
 		String.sub str n ((String.length str) - n)
 	in
+	let strWithoutLastN str n =
+		String.sub str 0 ((String.length str) - n)
+	in
 	let getStrChars str =
 		let rec recursive str n =
 			if (n < String.length str) && ((str.[n] >= 'a' && str.[n] <= 'z') || (str.[n] >= 'A' && str.[n] <= 'Z')) then
@@ -35,14 +38,20 @@ let rec lexer str =
 	let startsWithIMultipleFloat (str:string) =
 		let iMultipleFloatReg = Str.regexp "\\(-?[0-9]*\\.[0-9]+i\\)\\(.*\\)" in
 			if (Str.string_match iMultipleFloatReg str 0) then
-				Some ((Str.matched_group 1 str),  (try Str.matched_group 2 str with | Not_found -> ""))
+				let s = strWithoutLastN (Str.matched_group 1 str) 1 in Some (s,  (try Str.matched_group 2 str with | Not_found -> ""))
 			else
 				None
 	in
 	let startsWithIMultipleInteger (str:string) =
 		let iMultipleIntegerReg = Str.regexp "\\(-?[0-9]*i\\)\\(.*\\)" in
 			if (Str.string_match iMultipleIntegerReg str 0) then
-				Some ((Str.matched_group 1 str),  (try Str.matched_group 2 str with | Not_found -> ""))
+			begin
+				let s = strWithoutLastN (Str.matched_group 1 str) 1 in
+				if s = "" then
+					Some ("1", (try Str.matched_group 2 str with | Not_found -> ""))
+				else
+					Some (s,  (try Str.matched_group 2 str with | Not_found -> ""))
+			end
 			else
 				None
 	in
