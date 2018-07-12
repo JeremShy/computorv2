@@ -61,7 +61,7 @@ let rec do_simple_op buffer state matrix_compatible int_op float_op matrix_matri
 	end
 	| _ -> raise (Types.Execution_error "Error : Can only add two numbers for the moment")
 
-let resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t) =
+let rec resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t) =
 	let rec recu (expr:Entity.expression) (buffer: Entity.bufferable list) =
 		match expr with
 		| Entity.Nbr(a)::tl -> recu tl (Entity.Nbr(a)::buffer)
@@ -83,7 +83,8 @@ let resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t
 				recu tl (do_simple_op buffer state false int_power ( ** ) false false)
 			| MatrixMultiplication ->
 				recu tl (do_simple_op buffer state false int_power ( ** ) false false) (* TODO: Ajouter des fonctions cools pour l'operateur de multiplication de matrix *)
-			| _ -> raise (Types.Execution_error "Not yet handled !")
+			| FunctionApplication ->
+				recu tl (func_operator buffer state)
 			end
 		| Entity.Variable(v)::tl -> begin
 										try match (Hashtbl.find state v)
@@ -102,3 +103,19 @@ let resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t
 				end
 		in
 	recu expr []
+
+and apply_function (f:Entity.func_obj) (value:Nbr.nbr) (old_state:(string, Entity.definable) Hashtbl.t) : Nbr.nbr =
+    let state = Hashtbl.copy old_state in
+	Hashtbl.replace state f#get_param_name (Entity.Variable(value)) ;
+	resolve f#get_expr state
+and func_operator (buffer:Entity.bufferable list) (state:(string, Entity.definable) Hashtbl.t) =
+	match buffer with
+	| Entity.Nbr(n)::Entity.Func(f)::tl ->
+	(
+		try match Hashtbl.find state f with
+		| Entity.Func(f_obj) -> Entity.Nbr(apply_function f_obj n state)::tl
+		| Entity.Variable(v) -> raise (Types.Execution_error "Error 70")
+		with
+		| Not_found -> raise (Types.Execution_error ("Error : Unknown function : " ^ f))
+	)
+	| _ -> raise (Types.Execution_error "Error 118")

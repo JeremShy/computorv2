@@ -6,7 +6,10 @@ let rec computorv2 (state:(string, Entity.definable) Hashtbl.t) =
 	let parsed_line = Parser.parser lexed_line in
 	begin
 		match parsed_line with
-		| Entity.FunctionDefinition (name, parameter, expr) -> print_endline ("Defining function " ^ name ^ " with variable " ^ parameter ^ " and expression : ") ; Utils.print_entity_lst expr
+		| Entity.FunctionDefinition (name, parameter, expr) ->
+			print_endline ("Defining function " ^ name ^ " with variable " ^ parameter ^ " and expression : ") ;
+			Utils.print_entity_lst expr ;
+			Hashtbl.replace state name (Entity.Func(new Entity.func_obj parameter expr))
 		| Entity.VariableDefinition (name, expr) ->
 		begin
 			print_endline ("Defining variable " ^ name ^ " = "); Utils.print_entity_lst expr ;
