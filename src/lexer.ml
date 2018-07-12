@@ -1,4 +1,8 @@
 let rec lexer str =
+	let isalpha = function
+		| 'a' .. 'z' | 'A' .. 'Z' ->  true
+		| _ -> false
+	in
 	let strWithoutFirstN str n =
 		String.sub str n ((String.length str) - n)
 	in
@@ -35,37 +39,47 @@ let rec lexer str =
 		else
 			None
 	in
-	let startsWithIMultipleFloat (str:string) =
-		let iMultipleFloatReg = Str.regexp "\\(-?[0-9]*\\.[0-9]+i\\)\\(.*\\)" in
-			if (Str.string_match iMultipleFloatReg str 0) then
-				let s = strWithoutLastN (Str.matched_group 1 str) 1 in Some (s,  (try Str.matched_group 2 str with | Not_found -> ""))
-			else
-				None
-	in
 	let startsWithIMultipleInteger (str:string) =
 		let iMultipleIntegerReg = Str.regexp "\\(-?[0-9]*i\\)\\(.*\\)" in
 			if (Str.string_match iMultipleIntegerReg str 0) then
 			begin
-				let s = strWithoutLastN (Str.matched_group 1 str) 1 in
-				if s = "" then
-					Some ("1", (try Str.matched_group 2 str with | Not_found -> ""))
-				else
-					Some (s,  (try Str.matched_group 2 str with | Not_found -> ""))
+				if Str.matched_group 2 str <> "" && (isalpha (Str.matched_group 2 str).[0] = true) then
+						None
+				else let s = strWithoutLastN (Str.matched_group 1 str) 1 in
+				(
+					if s = "" then
+						Some ("1", Str.matched_group 2 str)
+					else
+						Some (s, Str.matched_group 2 str)
+				)
 			end
+			else
+				None
+	in
+	let startsWithIMultipleFloat (str:string) =
+		let iMultipleFloatReg1 = Str.regexp "\\(-?[0-9]*\\.[0-9]+i\\)\\(.*\\)" in
+		let iMultipleFloatReg2 = Str.regexp "\\(-?[0-9]+\\.[0-9]*i\\)\\(.*\\)" in
+			if (Str.string_match iMultipleFloatReg1 str 0) && (Str.matched_group 2 str = "" || isalpha (Str.matched_group 2 str).[0] = false) then
+				Some (strWithoutLastN (Str.matched_group 1 str) 1, Str.matched_group 2 str)
+			else if (Str.string_match iMultipleFloatReg2 str 0) && (Str.matched_group 2 str = "" || isalpha (Str.matched_group 2 str).[0] = false) then
+				Some (strWithoutLastN (Str.matched_group 1 str) 1, Str.matched_group 2 str)
 			else
 				None
 	in
 	let startsWithRealInteger (str:string) =
 		let realIntegerReg = Str.regexp "\\(-?[0-9]+\\)\\(.*\\)" in
 			if (Str.string_match realIntegerReg str 0) then
-				Some ((Str.matched_group 1 str),  (try Str.matched_group 2 str with | Not_found -> ""))
+				Some ((Str.matched_group 1 str), Str.matched_group 2 str)
 			else
 				None
 	in
 	let startsWithRealFloat(str:string) =
-		let realFloatReg = Str.regexp "\\(-?[0-9]*\\.[0-9]+\\)\\(.*\\)" in
-			if (Str.string_match realFloatReg str 0) then
-				Some ((Str.matched_group 1 str),  (try Str.matched_group 2 str with | Not_found -> ""))
+		let realFloatReg1 = Str.regexp "\\(-?[0-9]*\\.[0-9]+\\)\\(.*\\)" in
+		let realFloatReg2 = Str.regexp "\\(-?[0-9]+\\.[0-9]*\\)\\(.*\\)" in
+			if (Str.string_match realFloatReg1 str 0) then
+				Some ((Str.matched_group 1 str),  Str.matched_group 2 str)
+			else if (Str.string_match realFloatReg2 str 0) then
+				Some ((Str.matched_group 1 str),  Str.matched_group 2 str)
 			else
 				None
 	in
