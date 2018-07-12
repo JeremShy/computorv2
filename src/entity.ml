@@ -4,9 +4,12 @@ type entity = Nbr of Nbr.nbr | Func of func | Operator of Operator.operator | Va
 
 type definable = Func of func | Variable of variable
 
+
 type expression = entity list (* Polonaised list of entities *)
 
 type operation_type = FunctionDefinition of (string * variable * expression)	(* Function name, function parameter, function definition *)
 						| VariableDefinition of (variable * expression)		(* Variable and expression *)
 						| ExpressionSolving of expression						(* a + 2 = ? ou f(2) = ? *)
 						| EquationSolving of (string * Nbr.nbr)				(* Function name,  Value to be equal to *)
+
+type bufferable = Func of func | Operator of Operator.operator | Nbr of Nbr.nbr

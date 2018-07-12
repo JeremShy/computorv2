@@ -8,7 +8,7 @@ let rec computorv2 (state:(string, Entity.definable) Hashtbl.t) =
 		match parsed_line with
 		| Entity.FunctionDefinition (name, parameter, expr) -> print_endline ("Defining function " ^ name ^ " with variable " ^ parameter ^ " and expression : ") ; Utils.print_entity_lst expr
 		| Entity.VariableDefinition (name, expr) -> print_endline ("Defining variable " ^ name ^ " = "); Utils.print_entity_lst expr
-		| _ -> print_endline "Not yet handled"
+		| _ -> print_endline "Not yet handled" ;
 	end ;
 	computorv2 state
 

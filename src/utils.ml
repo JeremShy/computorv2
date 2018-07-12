@@ -12,7 +12,7 @@ let print_lex_lst lst =
 	print_newline () ;
 	List.iter (fun x -> print_endline x#to_string) lst ; print_newline ()
 
-let rec print_entity_lst lst =
+let rec print_entity_lst (lst:Entity.entity list) =
 	match lst with
 	| Entity.Nbr(elem)::tl -> begin
 								match elem with

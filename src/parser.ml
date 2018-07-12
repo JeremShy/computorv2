@@ -36,7 +36,7 @@ let get_lvalue_and_rvalue lst =
 	in
 	recu lst [] [] true
 
-let create_elem_from_lex_nbr = function
+let create_elem_from_lex_nbr (nbr:Lexeme.lexeme) : Entity.entity = match nbr with
 	| hd when hd#get_type = Types.IMultipleFloat	->	Entity.Nbr(Nbr.IMultipleFloat(float_of_string hd#get_content))
 	| hd when hd#get_type = Types.IMultipleInteger	->	Entity.Nbr(Nbr.IMultipleInteger(int_of_string hd#get_content))
 	| hd when hd#get_type = Types.RealFloat			->	Entity.Nbr(Nbr.RealFloat(float_of_string hd#get_content))
@@ -72,7 +72,7 @@ let get_next_group (lst:Lexeme.lexeme list) : (Lexeme.lexeme list * Lexeme.lexem
 	in
 	recu lst [] 0
 
-let rec convert_op_buffer = function
+let rec convert_op_buffer (param:Lexeme.lexeme list) : Entity.entity list = match param with
 	| hd::tail when hd#get_type <> Types.Operator -> raise (Invalid_argument "convert_op_buffer")
 	| hd::tail when hd#get_content = "+" -> Entity.Operator(Operator.Addition)::(convert_op_buffer tail)
 	| hd::tail when hd#get_content = "-" -> Entity.Operator(Operator.Substraction)::(convert_op_buffer tail)
@@ -84,8 +84,8 @@ let rec convert_op_buffer = function
 	| hd::tail -> raise (Invalid_argument ("convert_op_buffer 2 -- " ^ hd#get_content))
 	| [] -> []
 
-let rec polonaise_me lexemes =
-  let rec recu lexemes op_buffer ret_buffer expecting_operator =
+let rec polonaise_me (lexemes:Lexeme.lexeme list) : Entity.expression =
+  let rec recu lexemes op_buffer (ret_buffer:Entity.expression) expecting_operator =
     if (expecting_operator = false) then
       begin
      match lexemes with
