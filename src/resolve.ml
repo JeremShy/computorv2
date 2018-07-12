@@ -61,8 +61,7 @@ let rec do_simple_op buffer state matrix_compatible int_op float_op matrix_matri
 	end
 	| _ -> raise (Types.Execution_error "Error : Can only add two numbers for the moment")
 
-
-let resolve (expr:Entity.expression) state =
+let resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t) =
 	let rec recu (expr:Entity.expression) (buffer: Entity.bufferable list) =
 		match expr with
 		| Entity.Nbr(a)::tl -> recu tl (Entity.Nbr(a)::buffer)
@@ -86,7 +85,13 @@ let resolve (expr:Entity.expression) state =
 				recu tl (do_simple_op buffer state false int_power ( ** ) false false) (* TODO: Ajouter des fonctions cools pour l'operateur de multiplication de matrix *)
 			| _ -> raise (Types.Execution_error "Not yet handled !")
 			end
-		| Entity.Variable(v)::tl -> raise (Types.Execution_error "Not yet handled !")
+		| Entity.Variable(v)::tl -> begin
+										try match (Hashtbl.find state v)
+										with
+										| Variable(nbr) -> recu tl (Nbr(nbr)::buffer)
+										| Func(f) -> raise (Types.Execution_error "Error : This is a function and not a variale")
+										with | Not_found -> raise (Types.Execution_error "Variable not defined")
+									end
 		| [] ->
 				if (List.length buffer <> 1) then raise (Types.Execution_error "Error while resolving the expression")
 				else

@@ -130,6 +130,10 @@ let is_variable_definition lvalue rvalue = match lvalue with
 	| variable_name::[] when variable_name#get_type = Types.String -> Some(variable_name#get_content)
 	| _ -> None
 
+let is_expression_solving lvalue rvalue = match rvalue with
+	| inter::[] when inter#get_type = Types.Symbole && inter#get_content = "?" -> Some()
+	| _ -> None
+
 let parser lexemes =
 	if count_equals_symbols lexemes <> 1 then
 		raise (Types.Parser_error "Too many or too few '=' symbols were given")
@@ -137,11 +141,14 @@ let parser lexemes =
 		let (lvalue, rvalue) = get_lvalue_and_rvalue lexemes in
 	print_endline "lvalue : " ; Utils.print_lex_lst lvalue ;
 	print_endline "rvalue : " ; Utils.print_lex_lst rvalue ;
+	match is_expression_solving lvalue rvalue with
+	| Some () -> Entity.ExpressionSolving(polonaise_me lvalue)
+	| None ->
 	match is_function_definition lvalue rvalue with
 	| Some (function_name, variable_name) -> Entity.FunctionDefinition (function_name, variable_name, polonaise_me rvalue)
 	| None ->
 	match is_variable_definition lvalue rvalue with
 	| Some (variable_name) -> Entity.VariableDefinition(variable_name, polonaise_me rvalue)
-	| None -> raise (Types.Parser_error "Not yet handled")
+	| None ->  raise (Types.Parser_error "Not yet handled")
 	(* let (r, l) = (polonaise_me lvalue,  rvalue) in
 	Utils.print_entity_lst r *)

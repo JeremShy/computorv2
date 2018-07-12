@@ -7,7 +7,14 @@ let rec computorv2 (state:(string, Entity.definable) Hashtbl.t) =
 	begin
 		match parsed_line with
 		| Entity.FunctionDefinition (name, parameter, expr) -> print_endline ("Defining function " ^ name ^ " with variable " ^ parameter ^ " and expression : ") ; Utils.print_entity_lst expr
-		| Entity.VariableDefinition (name, expr) -> print_endline ("Defining variable " ^ name ^ " = "); Utils.print_entity_lst expr ; Utils.print_nbr (Resolve.resolve expr state) ; print_newline () 
+		| Entity.VariableDefinition (name, expr) ->
+			begin
+			print_endline ("Defining variable " ^ name ^ " = "); Utils.print_entity_lst expr ;
+			let nbr = Resolve.resolve expr state in
+			Utils.print_nbr nbr ;
+			Hashtbl.replace state name (Entity.Variable(nbr)) ;
+			print_newline ()
+			end
 		| _ -> print_endline "Not yet handled" ;
 	end ;
 	computorv2 state
