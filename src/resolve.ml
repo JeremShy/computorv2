@@ -93,7 +93,7 @@ let resolve (expr:Entity.expression) state =
 				begin
 					match (List.hd buffer) with
 					| Entity.Func(f) -> raise (Types.Execution_error "A function was not applied")
-					| sth -> sth
+					| Entity.Nbr(n) -> n
 				end
 		in
 	recu expr []

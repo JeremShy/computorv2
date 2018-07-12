@@ -12,6 +12,16 @@ let print_lex_lst lst =
 	print_newline () ;
 	List.iter (fun x -> print_endline x#to_string) lst ; print_newline ()
 
+let print_nbr (nbr:Nbr.nbr) =
+	match nbr with
+	| RealInteger x  -> print_int x
+	| RealFloat x -> print_float x
+	| IMultipleFloat x -> print_float x ; print_char 'i'
+	| IMultipleInteger x -> print_int x ; print_char 'i'
+	| Matrix m -> raise (Invalid_argument "Not yet handled")
+	| ComplexNbr c -> print_string (c#describe)
+	
+
 let rec print_entity_lst (lst:Entity.entity list) =
 	match lst with
 	| Entity.Nbr(elem)::tl -> begin
