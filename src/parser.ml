@@ -15,7 +15,6 @@ let get_operator_priority lexeme =
 	else
 		0
 
-
 let count_equals_symbols lst =
 	let rec recu lst n =
 		match lst with

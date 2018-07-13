@@ -1,7 +1,11 @@
 (* 11+ *)
 
 let int_power a b =
-	int_of_float ((float_of_int a) ** (float_of_int b))
+  int_of_float ((float_of_int a) ** (float_of_int b))
+
+let is_special_op (op:Operator.operator) = function
+  | Multiplication | Division | Power | Modulo -> true
+  |  ->
 
 let do_simple_op buffer state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op operation =
 	match buffer with
