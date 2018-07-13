@@ -3,9 +3,9 @@
 let int_power a b =
 	int_of_float ((float_of_int a) ** (float_of_int b))
 
-let rec do_simple_op buffer state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op =
+let do_simple_op buffer state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op operation =
 	match buffer with
-	| Entity.Nbr(n1)::Entity.Nbr(n2)::tl ->
+	| Entity.Nbr(n2)::Entity.Nbr(n1)::tl ->
 	begin
 		match n1 with
 		| Nbr.RealInteger(x) ->
@@ -21,42 +21,52 @@ let rec do_simple_op buffer state matrix_compatible int_op float_op matrix_matri
 		| Nbr.RealFloat(f) ->
 		begin
 			match n2 with
+			| Nbr.RealInteger(x) -> (Entity.Nbr(Nbr.RealFloat(float_op f (float_of_int x))))::tl
 			| Nbr.RealFloat(f2) -> (Entity.Nbr(Nbr.RealFloat(float_op f f2)))::tl
 			| Nbr.IMultipleInteger(xi) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex f (float_of_int xi))))::tl
 			| Nbr.IMultipleFloat(fi) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex f fi)))::tl
 			| Nbr.Matrix(m) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 			| Nbr.ComplexNbr(z) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part f) z#get_imaginary_part)))::tl
-			| _ -> do_simple_op (Entity.Nbr(n2)::Entity.Nbr(n1)::tl) state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op
 		end
 		| Nbr.IMultipleInteger(xi) ->
 		begin
 			match n2 with
+			| Nbr.RealInteger(x) -> (Entity.Nbr(Nbr.IMultipleInteger(int_op xi xi)))::tl
+			| Nbr.RealFloat(f) -> (Entity.Nbr(Nbr.IMultipleFloat(float_op (float_of_int xi) f)))::tl
 			| Nbr.IMultipleInteger(xi2) -> (Entity.Nbr(Nbr.IMultipleInteger(int_op xi xi2)))::tl
 			| Nbr.IMultipleFloat(fi) -> (Entity.Nbr(Nbr.IMultipleFloat(float_op (float_of_int xi) fi)))::tl
 			| Nbr.Matrix(m) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 			| Nbr.ComplexNbr(z) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex z#get_real_part (float_op (float_of_int xi) z#get_imaginary_part))))::tl
-			| _ -> do_simple_op (Entity.Nbr(n2)::Entity.Nbr(n1)::tl) state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op
 		end
 		| Nbr.IMultipleFloat(fi) ->
 		begin
 			match n2 with
+			| Nbr.RealInteger(x) -> (Entity.Nbr(Nbr.IMultipleFloat(float_op fi (float_of_int x))))::tl
+			| Nbr.RealFloat(f) -> (Entity.Nbr(Nbr.IMultipleFloat(float_op fi f)))::tl
+			| Nbr.IMultipleInteger(xi) -> (Entity.Nbr(Nbr.IMultipleFloat(float_op fi (float_of_int xi))))::tl
 			| Nbr.IMultipleFloat(fi2) -> (Entity.Nbr(Nbr.IMultipleFloat(float_op fi fi2)))::tl
 			| Nbr.Matrix(m) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 			| Nbr.ComplexNbr(z) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex z#get_real_part (float_op fi z#get_imaginary_part))))::tl
-			| _ -> do_simple_op (Entity.Nbr(n2)::Entity.Nbr(n1)::tl) state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op
 		end
 		| Nbr.Matrix(m) ->
 		begin
 			match n2 with
+			| Nbr.RealInteger(x) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
+			| Nbr.RealFloat(f) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
+			| Nbr.IMultipleInteger(xi) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
+			| Nbr.IMultipleFloat(fi) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 			| Nbr.Matrix(m) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 			| Nbr.ComplexNbr(z) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
-			| _ -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 		end
 		| Nbr.ComplexNbr(z) ->
 		begin
 			match n2 with
+			| Nbr.RealInteger(x) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part (float_of_int x)) z#get_imaginary_part)))::tl
+			| Nbr.RealFloat(f) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part f) z#get_imaginary_part)))::tl
+			| Nbr.IMultipleInteger(xi) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex z#get_real_part (float_op z#get_imaginary_part (float_of_int xi)))))::tl
+			| Nbr.IMultipleFloat(fi) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex z#get_real_part (float_op z#get_imaginary_part fi))))::tl
+			| Nbr.Matrix(m) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
 			| Nbr.ComplexNbr(z2) -> Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part z2#get_real_part) (float_op z#get_imaginary_part z2#get_imaginary_part)))::tl
-			| _ -> do_simple_op (Entity.Nbr(n2)::Entity.Nbr(n1)::tl) state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op
 		end
 	end
 	| _ -> raise (Types.Execution_error "Error : Can only add two numbers for the moment")
@@ -70,19 +80,19 @@ let rec resolve (expr:Entity.expression) (state:(string, Entity.definable) Hasht
 			begin
 			match o with
 			| Addition ->
-				recu tl (do_simple_op buffer state false ( + ) ( +. ) false false)
+				recu tl (do_simple_op buffer state false ( + ) ( +. ) false false Operator.Addition)
 			| Multiplication ->
-				recu tl (do_simple_op buffer state false ( * ) ( *. ) false false) (* TODO: Ajouter l'operateur pour l'operation multiplication de matrix et int *)
+				recu tl (do_simple_op buffer state false ( * ) ( *. ) false false Operator.Multiplication) (* TODO: Ajouter l'operateur pour l'operation multiplication de matrix et int *)
 			| Substraction ->
-				recu tl (do_simple_op buffer state false ( - ) ( -. ) false false)
+				recu tl (do_simple_op buffer state false ( - ) ( -. ) false false Operator.Substraction)
 			| Division ->
-				recu tl (do_simple_op buffer state false ( / ) ( /. ) false false)
+				recu tl (do_simple_op buffer state false ( / ) ( /. ) false false Operator.Division)
 			| Modulo ->
-				recu tl (do_simple_op buffer state false ( mod ) mod_float false false)
+				recu tl (do_simple_op buffer state false ( mod ) mod_float false false Operator.Modulo)
 			| Power ->
-				recu tl (do_simple_op buffer state false int_power ( ** ) false false)
+				recu tl (do_simple_op buffer state false int_power ( ** ) false false Operator.Power)
 			| MatrixMultiplication ->
-				recu tl (do_simple_op buffer state false int_power ( ** ) false false) (* TODO: Ajouter des fonctions cools pour l'operateur de multiplication de matrix *)
+				recu tl (do_simple_op buffer state false int_power ( ** ) false false Operator.MatrixMultiplication) (* TODO: Ajouter des fonctions cools pour l'operateur de multiplication de matrix *)
 			| FunctionApplication ->
 				recu tl (func_operator buffer state)
 			end
