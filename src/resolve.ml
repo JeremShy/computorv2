@@ -3,7 +3,25 @@
 let int_power a b =
   int_of_float ((float_of_int a) ** (float_of_int b))
 
+(*
+	* buffer	= the working stack from which n1 and n2 must be extracted
+*)
+let do_op buffer op =
+	match buffer with
+	| Entity.Nbr(n1) :: Entity.Nbr(n2) :: tl ->
+	begin
+		match op with
+		| Operator.Addition -> (Operations.add n1 n2)::	tl
+		| Operator.Division -> (Operations.div n1 n2)::	tl
+		| _ -> failwith "Not yet handled"
+	end
+	| _ -> raise (Types.Execution_error "Error 12")
+
 let rec resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t) =
+	(*
+		* expr		= Reverse polish expression to solve
+	 	* buffer	= The working stack of the evaluation algorithm
+	*)
 	let rec recu (expr:Entity.expression) (buffer: Entity.bufferable list) =
 		match expr with
 		| Entity.Nbr(a)::tl -> recu tl (Entity.Nbr(a)::buffer)
