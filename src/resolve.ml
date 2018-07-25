@@ -4,8 +4,8 @@ let int_power a b =
   int_of_float ((float_of_int a) ** (float_of_int b))
 
 let is_special_op (op:Operator.operator) = function
-  | Multiplication | Division | Power | Modulo -> true
-  |  ->
+  | Operator.Multiplication | Operator.Division | Operator.Power | Operator.Modulo -> true
+  |  _ -> false
 
 let do_simple_op buffer state matrix_compatible int_op float_op matrix_matrix_op matrix_scalar_op operation =
 	match buffer with
@@ -64,13 +64,7 @@ let do_simple_op buffer state matrix_compatible int_op float_op matrix_matrix_op
 		end
 		| Nbr.ComplexNbr(z) ->
 		begin
-			match n2 with
-			| Nbr.RealInteger(x) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part (float_of_int x)) z#get_imaginary_part)))::tl
-			| Nbr.RealFloat(f) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part f) z#get_imaginary_part)))::tl
-			| Nbr.IMultipleInteger(xi) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex z#get_real_part (float_op z#get_imaginary_part (float_of_int xi)))))::tl
-			| Nbr.IMultipleFloat(fi) -> (Entity.Nbr(Nbr.ComplexNbr(new Complex.complex z#get_real_part (float_op z#get_imaginary_part fi))))::tl
-			| Nbr.Matrix(m) -> raise (Types.Execution_error "Can't use this operator on a matrix.")
-			| Nbr.ComplexNbr(z2) -> Entity.Nbr(Nbr.ComplexNbr(new Complex.complex (float_op z#get_real_part z2#get_real_part) (float_op z#get_imaginary_part z2#get_imaginary_part)))::tl
+			Entity.Nbr(ComplexNbr(ComplexCalculator.do_op z n2 operation)) :: tl
 		end
 	end
 	| _ -> raise (Types.Execution_error "Error : Can only add two numbers for the moment")

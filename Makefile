@@ -1,7 +1,7 @@
 RESULT = computorv2
 SOURCES = src/types.ml src/utils.ml src/lexeme.ml src/lexer.ml \
 			src/complex.ml src/matrix.ml src/nbr.ml src/operator.ml src/entity.ml src/parser.ml \
-			src/resolve.ml \
+			src/complexCalculator.ml src/resolve.ml \
 			src/main.ml
 LIBS=Str
 OCAMLMAKEFILE = OCamlMakefile
