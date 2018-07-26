@@ -16,6 +16,7 @@ let sub c1 c2 =
 
 let div c1 c2 =
 	let (a, b, c, d) = expand_two_complex c1 c2 in
+	if (c ** 2. +. d ** 2. = 0.) then raise (Types.Execution_error "Division by 0") else
 	to_nbr (
 				new Complex.complex
 				((a *. c +. b *. d) /. (c ** 2. +. d ** 2.))

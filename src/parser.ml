@@ -140,8 +140,8 @@ let parser lexemes =
 		raise (Types.Parser_error "Too many or too few '=' symbols were given")
 	else
 		let (lvalue, rvalue) = get_lvalue_and_rvalue lexemes in
-	print_endline "lvalue : " ; Utils.print_lex_lst lvalue ;
-	print_endline "rvalue : " ; Utils.print_lex_lst rvalue ;
+	(* print_endline "lvalue : " ; Utils.print_lex_lst lvalue ;
+	print_endline "rvalue : " ; Utils.print_lex_lst rvalue ; *)
 	match is_expression_solving lvalue rvalue with
 	| Some () -> Entity.ExpressionSolving(polonaise_me lvalue)
 	| None ->
