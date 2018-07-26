@@ -16,6 +16,7 @@ let do_op buffer op =
 		| Operator.Substraction		-> Entity.Nbr(Operations.sub converted_1 converted_2)::tl
 		| Operator.Division			-> Entity.Nbr(Operations.div converted_1 converted_2)::tl
 		| Operator.Multiplication	-> Entity.Nbr(Operations.mul converted_1 converted_2)::tl
+		| Operator.Power			-> Entity.Nbr(Operations.pow converted_1 converted_2)::tl
 		| Operator.Modulo			-> Entity.Nbr(Operations.modulus converted_1 converted_2)::tl
 		| _ -> failwith "Not yet handled"
 	end
