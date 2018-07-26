@@ -41,9 +41,8 @@ let pow (c1:Complex.complex) (c2:Complex.complex) =
 	if c2#get_imaginary_part <> 0. then raise (Types.Execution_error "Can not pow to imaginary number") else
 	if not (is_int c2#get_real_part) then raise (Types.Execution_error "Can pow only to natural numbers") else
 	let n = (int_of_float c2#get_real_part) in
-	let rec recu (c:Complex.complex) (n:int) : Complex.complex =
-		if n = 0 then (new Complex.complex 1. 0.)
-		else if n = 1 then c
-		else from_nbr (mul c (recu c (n - 1)))
+	let rec recu (c:Complex.complex) (n:int) (acc:Complex.complex) : Complex.complex =
+		if n = 0 then acc
+		else (recu c (n - 1) (from_nbr (mul c acc)))
 	in
-	to_nbr (recu c1 n)
+	to_nbr (recu c1 n (new Complex.complex 1. 0.))
