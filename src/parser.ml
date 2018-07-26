@@ -1,6 +1,7 @@
 (*
-	Returns a pair of two list of elements ordered in RPN, the lvalue and the rvalue
-	There can't be any symbol in this list, but there can be operators.
+	Returns the type of the expression (VariableDefinition, FunctionDefinition or ExpressionSolving) and the necessary parameters.
+
+	TODO : Add EquationSolving
 *)
 
 let get_operator_priority lexeme =
@@ -36,8 +37,8 @@ let get_lvalue_and_rvalue lst =
 	recu lst [] [] true
 
 let create_elem_from_lex_nbr (nbr:Lexeme.lexeme) : Entity.entity = match nbr with
-	| hd when hd#get_type = Types.IMultipleFloat	->	Entity.Nbr(Nbr.IMultipleFloat(float_of_string hd#get_content))
-	| hd when hd#get_type = Types.IMultipleInteger	->	Entity.Nbr(Nbr.IMultipleInteger(int_of_string hd#get_content))
+	| hd when hd#get_type = Types.IMultipleFloat	->	Entity.Nbr(Nbr.ComplexNbr(new Complex.complex 0. (float_of_string hd#get_content)))
+	| hd when hd#get_type = Types.IMultipleInteger	->	Entity.Nbr(Nbr.ComplexNbr(new Complex.complex 0. (float_of_string hd#get_content)))
 	| hd when hd#get_type = Types.RealFloat			->	Entity.Nbr(Nbr.RealFloat(float_of_string hd#get_content))
 	| hd when hd#get_type = Types.RealInteger		->	Entity.Nbr(Nbr.RealInteger(int_of_string hd#get_content))
 	| _ -> raise (Invalid_argument "create_elem_from_lex_nbr: argument is not a numeric lexeme")

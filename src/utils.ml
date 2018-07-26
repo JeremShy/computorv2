@@ -17,8 +17,6 @@ let print_nbr (nbr:Nbr.nbr) =
 		match nbr with
 		| RealInteger x  -> print_int x
 		| RealFloat x -> print_float x
-		| IMultipleFloat x -> print_float x ; print_char 'i'
-		| IMultipleInteger x -> print_int x ; print_char 'i'
 		| Matrix m -> raise (Invalid_argument "Not yet handled")
 		| ComplexNbr c -> print_string (c#describe)
 	) ; print_newline ()
@@ -30,8 +28,6 @@ let rec print_entity_lst (lst:Entity.entity list) =
 								match elem with
 									| RealInteger x  -> print_int x
 									| RealFloat x -> print_float x
-									| IMultipleFloat x -> print_float x ; print_char 'i'
-									| IMultipleInteger x -> print_int x ; print_char 'i'
 									| Matrix m -> raise (Invalid_argument "Not yet handled")
 									| ComplexNbr c -> print_string (c#describe)
 								end ; print_entity_lst tl
