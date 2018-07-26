@@ -17,17 +17,13 @@ let to_complex_nbr = function
 
 let convert in1 in2 =
 	let v1, v2 = (get_conv_value in1, get_conv_value in2) in
-	if (v1 == 3 || v2 == 3) then
-		(in1, in2) (* Special case *)
+	if (v1 = 3 || v2 = 3) then
+		(in1, in2) (* Special case of scalar-matrix or matrix-matrix operation. *)
 	else
 	(
 		let maxi = max v1 v2 in
-		if maxi == 0 then
-			(in1, in2)
-		else if maxi == 1 then
-			(to_real_float in1, to_real_float in2)
-		else if maxi == 2 then
-			(to_complex_nbr in1, to_complex_nbr in2)
-		else
-			failwith "This case is not supposed to happen !"
+		if maxi = 0 then (in1, in2)
+		else if maxi = 1 then (to_real_float in1, to_real_float in2)
+		else if maxi = 2 then (to_complex_nbr in1, to_complex_nbr in2)
+		else failwith "This case is not supposed to happen !"
 	)

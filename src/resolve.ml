@@ -8,11 +8,15 @@ let int_power a b =
 *)
 let do_op buffer op =
 	match buffer with
-	| Entity.Nbr(n1) :: Entity.Nbr(n2) :: tl ->
+	| Entity.Nbr(n2) :: Entity.Nbr(n1) :: tl -> (* The numbers are inverted in the polish stack *)
 	begin
+		let converted_1, converted_2 = Conversion.convert n1 n2 in
 		match op with
-		| Operator.Addition -> (Operations.add n1 n2)::	tl
-		| Operator.Division -> (Operations.div n1 n2)::	tl
+		| Operator.Addition			-> Entity.Nbr(Operations.add converted_1 converted_2)::tl
+		| Operator.Substraction		-> Entity.Nbr(Operations.sub converted_1 converted_2)::tl
+		| Operator.Division			-> Entity.Nbr(Operations.div converted_1 converted_2)::tl
+		| Operator.Multiplication	-> Entity.Nbr(Operations.mul converted_1 converted_2)::tl
+		| Operator.Modulo			-> Entity.Nbr(Operations.modulus converted_1 converted_2)::tl
 		| _ -> failwith "Not yet handled"
 	end
 	| _ -> raise (Types.Execution_error "Error 12")
@@ -29,9 +33,8 @@ let rec resolve (expr:Entity.expression) (state:(string, Entity.definable) Hasht
 		| Operator(o)::tl ->
 			begin
 			match o with
-			| FunctionApplication ->
-				recu tl (func_operator buffer state)
-			| _ -> failwith "Not yet handled"
+			| FunctionApplication -> recu tl (func_operator buffer state)
+			| _ -> recu tl (do_op buffer o)
 			end
 		| Entity.Variable(v)::tl -> begin
 										try match (Hashtbl.find state v)

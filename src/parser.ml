@@ -81,6 +81,7 @@ let rec convert_op_buffer (param:Lexeme.lexeme list) : Entity.entity list = matc
 	| hd::tail when hd#get_content = "^" -> Entity.Operator(Operator.Power)::(convert_op_buffer tail)
   	| hd::tail when hd#get_content = "**" -> Entity.Operator(Operator.MatrixMultiplication)::(convert_op_buffer tail)
   	| hd::tail when hd#get_content = "$" -> Entity.Operator(Operator.FunctionApplication)::(convert_op_buffer tail)
+  	| hd::tail when hd#get_content = "%" -> Entity.Operator(Operator.Modulo)::(convert_op_buffer tail)
 	| hd::tail -> raise (Invalid_argument ("convert_op_buffer 2 -- " ^ hd#get_content))
 	| [] -> []
 
