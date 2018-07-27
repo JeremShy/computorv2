@@ -20,8 +20,8 @@ let handle_line (line:string) (state:(string, Entity.definable) Hashtbl.t) =
         | Entity.ExpressionSolving expr -> Utils.print_nbr (Resolve.resolve expr state)
         | _ -> print_endline "Not yet handled" ;
       end with
-      | Types.Execution_error(s) -> Printf.printf "An error occured while trying to execute the command : %s\n" s
-      | Types.Parser_error(s) -> Printf.printf "An error occured while trying to parse the command : %s\n" s
+      | Types.Execution_error(s) -> Printf.printf "Execution error : %s\n" s
+      | Types.Parser_error(s) -> Printf.printf "Syntax Error : %s\n" s
       | Types.Lexer_error -> Printf.printf "An error occured while trying to lex the command.\n"
       | Failure(s) -> Printf.printf "An error occured : %s\n" s
     end
