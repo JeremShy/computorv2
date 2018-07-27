@@ -10,8 +10,8 @@ let to_real_float = function
   | _ -> raise (Types.Execution_error "Can't convert this value to float")
 
 let to_complex_nbr = function
-  | Nbr.RealInteger(x) -> Nbr.ComplexNbr(new Complex.complex (float_of_int x) 0.)
-  | Nbr.RealFloat(f) -> Nbr.ComplexNbr(new Complex.complex f 0.)
+  | Nbr.RealInteger(x) -> Nbr.ComplexNbr(new Ft_complex.complex (float_of_int x) 0.)
+  | Nbr.RealFloat(f) -> Nbr.ComplexNbr(new Ft_complex.complex f 0.)
   | Nbr.ComplexNbr(c) -> Nbr.ComplexNbr(c)
   | _ -> raise (Types.Execution_error "Can't convert this value to float")
 

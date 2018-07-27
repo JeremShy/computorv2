@@ -35,8 +35,8 @@ let get_lvalue_and_rvalue lst =
   recu lst [] [] true
 
 let create_elem_from_lex_nbr (nbr:Lexeme.lexeme) : Entity.entity = match nbr with
-  | hd when hd#get_type = Types.IMultipleFloat	->	Entity.Nbr(Nbr.ComplexNbr(new Complex.complex 0. (float_of_string hd#get_content)))
-  | hd when hd#get_type = Types.IMultipleInteger	->	Entity.Nbr(Nbr.ComplexNbr(new Complex.complex 0. (float_of_string hd#get_content)))
+  | hd when hd#get_type = Types.IMultipleFloat	->	Entity.Nbr(Nbr.ComplexNbr(new Ft_complex.complex 0. (float_of_string hd#get_content)))
+  | hd when hd#get_type = Types.IMultipleInteger	->	Entity.Nbr(Nbr.ComplexNbr(new Ft_complex.complex 0. (float_of_string hd#get_content)))
   | hd when hd#get_type = Types.RealFloat			->	Entity.Nbr(Nbr.RealFloat(float_of_string hd#get_content))
   | hd when hd#get_type = Types.RealInteger		->	Entity.Nbr(Nbr.RealInteger(int_of_string hd#get_content))
   | _ -> raise (Invalid_argument "create_elem_from_lex_nbr: argument is not a numeric lexeme")
