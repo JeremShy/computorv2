@@ -97,8 +97,7 @@ let rec polonaise_me (lexemes:Lexeme.lexeme list) : Entity.expression =
     if (expecting_operator = false) then
       begin
         match lexemes with
-        | hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat
-                      ||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat
+        | hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat ||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat
           -> recu tl op_buffer (ret_buffer @ [create_elem_from_lex_nbr hd]) true
 
         | hd::tl when hd#get_type = Types.String -> recu tl op_buffer (ret_buffer @ [Variable(hd#get_content)]) true
@@ -121,10 +120,18 @@ let rec polonaise_me (lexemes:Lexeme.lexeme list) : Entity.expression =
             recu tl [hd] (ret_buffer  @ (convert_op_buffer op_buffer)) false
           else
             recu tl (hd::op_buffer) ret_buffer false
-          (* 5x = 5 * x*)
+
+(* 5x = 5 * x*)
         | hd::tl when hd#get_type = Types.String || (hd#get_type = Types.Symbole && hd#get_content = "(") -> recu ((new Lexeme.lexeme "*" Types.Operator)::lexemes) op_buffer ret_buffer true
+
+        | hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat ||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> let n = create_elem_from_lex_nbr hd in
+          begin match n with
+            | Entity.Nbr(n) -> if Nbr.is_negative n then recu ((new Lexeme.lexeme "+" Types.Operator)::lexemes) op_buffer ret_buffer true else raise (Types.Execution_error "Expected operator")
+          | _ -> failwith "wtf 129"
+          end
+
         | [] -> ret_buffer @ convert_op_buffer op_buffer
-        | _ -> raise (Invalid_argument "Expected operator")
+        | _ -> raise (Types.Execution_error "Expected operator")
       end
   in
   recu lexemes [] [] false
