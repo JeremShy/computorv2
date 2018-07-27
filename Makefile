@@ -9,6 +9,9 @@ OCAMLMAKEFILE = OCamlMakefile
 
 -include $(OCAMLMAKEFILE)
 
+auto-ocp-indent: $(SOURCES)
+	for mlfile in $^; do ocp-indent -i $$mlfile; done
+
 fclean: clean
 
 re: clean bc
