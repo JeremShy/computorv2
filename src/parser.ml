@@ -1,7 +1,7 @@
-(*
+  (*
   Returns the type of the expression (VariableDefinition, FunctionDefinition or ExpressionSolving) and the necessary parameters.
   TODO : Add EquationSolving
-*)
+  *)
 
 let get_operator_priority lexeme =
   if (lexeme#get_type <> Types.Operator) then
@@ -83,14 +83,14 @@ let rec convert_op_buffer (param:Lexeme.lexeme list) : Entity.entity list = matc
   | hd::tail -> raise (Invalid_argument ("convert_op_buffer 2 -- " ^ hd#get_content))
   | [] -> []
 
-(*
-**	Polonaise_me : Transforms a list of lexeme into an expression (a list of entities. using recu, which has the following parameters) :
-**		Lexemes : The lexemes not yet processed.
-**		op_buffer : The operand buffer for the algorithm
-**		ret_buffer : The return buffer, which will serv as return value
-**		expecting_operator : boolean, true if an operator is expected (it's in the name, you gotta admit it).
+  (*
+  **	Polonaise_me : Transforms a list of lexeme into an expression (a list of entities. using recu, which has the following parameters) :
+  **		Lexemes : The lexemes not yet processed.
+  **		op_buffer : The operand buffer for the algorithm
+  **		ret_buffer : The return buffer, which will serv as return value
+  **		expecting_operator : boolean, true if an operator is expected (it's in the name, you gotta admit it).
   Alternatively true and false.
-*)
+  *)
 
 let rec polonaise_me (lexemes:Lexeme.lexeme list) : Entity.expression =
   let rec recu lexemes op_buffer (ret_buffer:Entity.expression) expecting_operator =
@@ -121,13 +121,13 @@ let rec polonaise_me (lexemes:Lexeme.lexeme list) : Entity.expression =
           else
             recu tl (hd::op_buffer) ret_buffer false
 
-(* 5x = 5 * x*)
+        (* 5x = 5 * x*)
         | hd::tl when hd#get_type = Types.String || (hd#get_type = Types.Symbole && hd#get_content = "(") -> recu ((new Lexeme.lexeme "*" Types.Operator)::lexemes) op_buffer ret_buffer true
 
         | hd::tl when hd#get_type = Types.IMultipleInteger || hd#get_type = Types.IMultipleFloat ||	hd#get_type = Types.RealInteger || hd#get_type = Types.RealFloat -> let n = create_elem_from_lex_nbr hd in
           begin match n with
             | Entity.Nbr(n) -> if Nbr.is_negative n then recu ((new Lexeme.lexeme "+" Types.Operator)::lexemes) op_buffer ret_buffer true else raise (Types.Execution_error "Expected operator")
-          | _ -> failwith "wtf 129"
+            | _ -> failwith "wtf 129"
           end
 
         | [] -> ret_buffer @ convert_op_buffer op_buffer
@@ -155,6 +155,19 @@ let is_expression_solving lvalue rvalue = match rvalue with
   | inter::[] when inter#get_type = Types.Symbole && inter#get_content = "?" -> Some()
   | _ -> None
 
+let is_equation_solving lvalue rvalue : (string * Entity.variable * Entity.entity) option = match lvalue with
+  | fbeg::variable_name::closing_par::[] when fbeg#get_type = Types.FunctionBeginning
+                                           && variable_name#get_type = Types.String
+                                           && closing_par#get_type = Types.Symbole && closing_par#get_content = ")" ->
+    (
+      match rvalue with
+      | nbr::inter::[] when (nbr#get_type = Types.String || nbr#get_type = Types.IMultipleInteger || nbr#get_type = Types.IMultipleFloat || nbr#get_type = Types.RealFloat || nbr#get_type = Types.RealInteger)
+                         && (inter#get_type = Types.Symbole && inter#get_content = "?") -> Some(fbeg#get_content, variable_name#get_content,
+                           if nbr#get_type = String then Entity.Variable(nbr#get_content) else (create_elem_from_lex_nbr nbr))
+      | _ -> None
+    )
+  | _ -> None
+
 let parser lexemes =
   if count_equals_symbols lexemes <> 1 then
     raise (Types.Parser_error "Too many or too few '=' symbols were given")
@@ -165,6 +178,9 @@ let parser lexemes =
     match is_expression_solving lvalue rvalue with
     | Some () -> Entity.ExpressionSolving(polonaise_me lvalue)
     | None ->
+      match is_equation_solving lvalue rvalue with
+      | Some (fname, unknown_name, value) -> Entity.EquationSolving(fname, unknown_name, value)
+      | None ->
       match is_function_definition lvalue rvalue with
       | Some (function_name, variable_name) -> Entity.FunctionDefinition (function_name, variable_name, polonaise_me rvalue)
       | None ->

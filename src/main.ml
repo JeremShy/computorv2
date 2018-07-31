@@ -17,8 +17,8 @@ let handle_line (line:string) (state:(string, Entity.definable) Hashtbl.t) =
             Utils.print_nbr nbr ;
             Hashtbl.replace state name (Entity.Variable(nbr))
           end
+        | Entity.EquationSolving(name, unknown, value) -> print_endline "An equation has to be solved"
         | Entity.ExpressionSolving expr -> Utils.print_nbr (Resolve.resolve expr state)
-        | _ -> print_endline "Not yet handled" ;
       end with
       | Types.Execution_error(s) -> Printf.printf "Execution error : %s\n" s
       | Types.Parser_error(s) -> Printf.printf "Syntax Error : %s\n" s
