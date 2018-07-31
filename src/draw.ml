@@ -1,15 +1,6 @@
 let box_x = 75
 let box_y = 25
 
-let draw_rectangle c1 c2 =
-  let (x1,y1) = c1 in
-  let (x2, y2) = c2 in
-  Graphics.moveto x1 y1;
-  Graphics.lineto x1 y2;
-  Graphics.lineto x2 y2;
-  Graphics.lineto x2 y1;
-  Graphics.lineto x1 y1
-
 let draw_line c1 c2 =
   let (x1,y1) = c1 in
   let (x2, y2) = c2 in
@@ -55,6 +46,7 @@ let draw_operator op x y =
 
 
 let draw_tree tree =
+  Graphics.open_graph " 800x600";
   let rec draw_tree_at tree x y =
     match tree with
     | Ast.Leaf(leaf) -> draw_leaf leaf x y
@@ -67,14 +59,19 @@ let draw_tree tree =
   draw_tree_at tree 100 400
 
 let test_draw () =
-  Graphics.open_graph " 800x600";
-  let test_tree = Ast.Node(
+  let test_tree = Ast.Node( (* 1 + 2 * x^2 *)
         (Operator.Addition,
         Ast.Leaf(Ast.Nbr(Nbr.RealInteger 1)),
         Ast.Node(
           Operator.Multiplication,
-          Ast.Leaf(Ast.Nbr(Nbr.ComplexNbr (new Ft_complex.complex 1. 2.))),
-          Ast.Leaf(Ast.Nbr(Nbr.RealFloat(2.)))
+          Ast.Leaf(Ast.Nbr(Nbr.RealInteger(2))),
+          Ast.Node(
+            Operator.Power,
+            Ast.Leaf(Ast.Variable("x")),
+            Ast.Leaf(Ast.Nbr(Nbr.RealInteger(2)))
+            )
         )))
   in
-  draw_tree test_tree
+  draw_tree test_tree ;
+  print_char (Graphics.read_key ()) ;
+  Graphics.close_graph ()

@@ -1,3 +1,22 @@
+Must transform RPN into an AST
+
+(1 + 2) * (3 - 4) = 12+34-*
+
+Resultat attendu :
+
+                  *
+         +               -
+     1       2        3      4
+
+
+12+34-*
+
+
+3 - 4
+1 + 2
+
+
+
 # Division
 $$
 ac + bd + i(bc - ad)

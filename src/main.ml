@@ -9,6 +9,8 @@ let handle_line (line:string) (state:(string, Entity.definable) Hashtbl.t) =
         | Entity.FunctionDefinition (name, parameter, expr) ->
           print_endline ("Defining function " ^ name ^ " with variable " ^ parameter ^ " and expression : ") ;
           Utils.print_entity_lst expr ;
+          let tree = Ast.ast_from_expr expr in
+          Draw.draw_tree tree ;
           Hashtbl.replace state name (Entity.Func(new Entity.func_obj parameter expr))
         | Entity.VariableDefinition (name, expr) ->
           begin
@@ -33,7 +35,7 @@ let rec computorv2 (state:(string, Entity.definable) Hashtbl.t) =
   computorv2 state
 
 let () =
-  ignore (Draw.test_draw ()) ;
+  (* let node =  *)
   let state = Hashtbl.create 32 in
   try computorv2 state with
   | End_of_file -> print_endline "Goodbye."
