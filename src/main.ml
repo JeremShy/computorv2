@@ -33,6 +33,7 @@ let rec computorv2 (state:(string, Entity.definable) Hashtbl.t) =
   computorv2 state
 
 let () =
+  ignore (Draw.test_draw ()) ;
   let state = Hashtbl.create 32 in
   try computorv2 state with
   | End_of_file -> print_endline "Goodbye."
