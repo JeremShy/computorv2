@@ -11,6 +11,19 @@ Resultat attendu :
 
 12+34-*
 
+Ici, on peut combiner x et y s'ils sont calculables, ainsi que x et z et z et y
+              +
+      x               +
+                  z      y
+
+
+Deux noeuds sont calculables si:
+
+. Dans le cas d'une addition ou d'une soustraction Factorisation : a * b + c * b = (a + c) * b
+  - Multiple de x^0 = 1, par exemple 1 + 2
+  - Multiple de x^1 = x, par exemple 2x + 3x
+  - Multiple de x^2 = x^2, par exemple 2x^2 - x^2
+
 
 3 - 4
 1 + 2
