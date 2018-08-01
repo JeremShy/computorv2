@@ -47,16 +47,20 @@ let draw_operator op x y =
 
 let draw_tree tree =
   Graphics.open_graph " 800x600";
-  let rec draw_tree_at tree x y =
+  let rec draw_tree_at tree x y n =
     match tree with
     | Ast.Leaf(leaf) -> draw_leaf leaf x y
     | Ast.Node(op, left, right) -> draw_operator op x y ;
-                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y + box_y / 2) ;
-                                    draw_tree_at left (x + box_x * 2) (y + box_y) ;
-                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y - 3 * box_y / 2) ;
-                                    draw_tree_at right (x + box_x * 2) (y - box_y)
+                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y + 3 * box_y - box_y / 2 - n * box_y) ;
+                                    draw_tree_at left (x + box_x * 2) (y + 3 * box_y - n * box_y) (n + 1);
+
+                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y - box_y / 2 - 3 * box_y + n  * box_y ) ;
+                                    draw_tree_at right (x + box_x * 2) (y - 3 * box_y + n * box_y) (n + 1)
   in
-  draw_tree_at tree 100 400
+  draw_tree_at tree 100 400 0 ;
+  print_char (Graphics.read_key ()) ;
+  Graphics.close_graph ()
+
 
 let test_draw () =
   let test_tree = Ast.Node( (* 1 + 2 * x^2 *)
@@ -72,6 +76,4 @@ let test_draw () =
             )
         )))
   in
-  draw_tree test_tree ;
-  print_char (Graphics.read_key ()) ;
-  Graphics.close_graph ()
+  draw_tree test_tree
