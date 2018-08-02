@@ -30,12 +30,18 @@ let handle_line (line:string) (state:(string, Entity.definable) Hashtbl.t) =
 
 let rec computorv2 (state:(string, Entity.definable) Hashtbl.t) =
   print_string "> " ;
-  let line = read_line () in
-  handle_line line state ;
+  (
+    try
+      let line = read_line () in
+      handle_line line state
+    with
+    | Sys.Break -> print_newline ()
+  ) ;
   computorv2 state
 
+
 let () =
-  (* let node =  *)
+  Sys.catch_break true ;
   let state = Hashtbl.create 32 in
   try computorv2 state with
   | End_of_file -> print_endline "Goodbye."
