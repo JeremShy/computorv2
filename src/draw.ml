@@ -51,11 +51,11 @@ let draw_tree tree =
     match tree with
     | Ast.Leaf(leaf) -> draw_leaf leaf x y
     | Ast.Node(op, left, right) -> draw_operator op x y ;
-                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y + 3 * box_y - box_y / 2 - n * box_y) ;
-                                    draw_tree_at left (x + box_x * 2) (y + 3 * box_y - n * box_y) (n + 1);
+                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y + 4 * box_y - box_y / 2 - n * box_y) ;
+                                    draw_tree_at left (x + box_x * 2) (y + 4 * box_y - n * box_y) (n + 1);
 
-                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y - box_y / 2 - 3 * box_y + n  * box_y ) ;
-                                    draw_tree_at right (x + box_x * 2) (y - 3 * box_y + n * box_y) (n + 1)
+                                    draw_line (x + box_x, y - box_y / 2) (x + box_x * 2, y - box_y / 2 - 4 * box_y + n  * box_y ) ;
+                                    draw_tree_at right (x + box_x * 2) (y - 4 * box_y + n * box_y) (n + 1)
   in
   draw_tree_at tree 100 400 0 ;
   print_char (Graphics.read_key ()) ;
