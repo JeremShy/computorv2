@@ -11,6 +11,8 @@ let handle_line (line:string) (state:(string, Entity.definable) Hashtbl.t) =
           Utils.print_entity_lst expr ;
           let tree = Ast.ast_from_expr expr in
           Draw.draw_tree tree ;
+          let tree = Simplify.simplify tree in
+          Draw.draw_tree tree ;
           Hashtbl.replace state name (Entity.Func(new Entity.func_obj parameter expr))
         | Entity.VariableDefinition (name, expr) ->
           begin

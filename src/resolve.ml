@@ -6,6 +6,19 @@ let int_power a b =
 (*
 	* buffer	= the working stack from which n1 and n2 must be extracted
 *)
+
+let do_simple_op n1 n2 op =
+  let converted_1, converted_2 = Conversion.convert n1 n2 in
+  match op with
+  | Operator.Addition			-> Entity.Nbr(Operations.add converted_1 converted_2)
+  | Operator.Substraction		-> Entity.Nbr(Operations.sub converted_1 converted_2)
+  | Operator.Division			-> Entity.Nbr(Operations.div converted_1 converted_2)
+  | Operator.Multiplication	-> Entity.Nbr(Operations.mul converted_1 converted_2)
+  | Operator.Power			-> Entity.Nbr(Operations.pow converted_1 converted_2)
+  | Operator.Modulo			-> Entity.Nbr(Operations.modulus converted_1 converted_2)
+  | _ -> failwith "Not yet handled"
+
+
 let do_op buffer op =
   match buffer with
   | Entity.Nbr(n2) :: Entity.Nbr(n1) :: tl -> (* The numbers are inverted in the polish stack *)
@@ -23,10 +36,10 @@ let do_op buffer op =
   | _ -> raise (Types.Execution_error "Error 12")
 
 let rec resolve (expr:Entity.expression) (state:(string, Entity.definable) Hashtbl.t) =
- (*
-		* expr		= Reverse polish expression to solve
-	 	* buffer	= The working stack of the evaluation algorithm
-	*)
+  (*
+    * expr		= Reverse polish expression to solve
+    * buffer	= The working stack of the evaluation algorithm
+  *)
   let rec recu (expr:Entity.expression) (buffer: Entity.bufferable list) =
     match expr with
     | Entity.Nbr(a)::tl -> recu tl (Entity.Nbr(a)::buffer)
