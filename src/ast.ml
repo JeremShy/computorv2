@@ -17,21 +17,21 @@ let ast_from_expr (expr:Entity.expression) : node =
     | Entity.Variable(n)::tl -> recu tl (Leaf_elem(Variable(n)) :: stack)
     | Entity.Func(f)::tl -> recu tl (Leaf_elem(Func(f)) :: stack)
     | Entity.Operator(op)::tl ->
-    (
-      match stack with
-      | Leaf_elem(n2)::Leaf_elem(n1)::stack_tl ->
-        recu tl (Node_elem(Node(op, Leaf(n1), Leaf(n2)))::stack_tl)
+      (
+        match stack with
+        | Leaf_elem(n2)::Leaf_elem(n1)::stack_tl ->
+          recu tl (Node_elem(Node(op, Leaf(n1), Leaf(n2)))::stack_tl)
 
-      | Node_elem(n2)::Leaf_elem(n1)::stack_tl ->
-        recu tl (Node_elem(Node(op, Leaf(n1), n2))::stack_tl)
+        | Node_elem(n2)::Leaf_elem(n1)::stack_tl ->
+          recu tl (Node_elem(Node(op, Leaf(n1), n2))::stack_tl)
 
-      | Leaf_elem(n2)::Node_elem(n1)::stack_tl ->
-        recu tl (Node_elem(Node(op, n1, Leaf(n2)))::stack_tl)
+        | Leaf_elem(n2)::Node_elem(n1)::stack_tl ->
+          recu tl (Node_elem(Node(op, n1, Leaf(n2)))::stack_tl)
 
-      | Node_elem(n2)::Node_elem(n1)::stack_tl ->
-        recu tl (Node_elem(Node(op, n1, n2))::stack_tl)
-      | _ -> raise (Types.Execution_error "Unexpected operator")
-    )
+        | Node_elem(n2)::Node_elem(n1)::stack_tl ->
+          recu tl (Node_elem(Node(op, n1, n2))::stack_tl)
+        | _ -> raise (Types.Execution_error "Unexpected operator")
+      )
   in
   let rez = recu expr [] in
   match rez with

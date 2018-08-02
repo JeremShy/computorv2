@@ -163,7 +163,7 @@ let is_equation_solving lvalue rvalue : (string * Entity.variable * Entity.entit
       match rvalue with
       | nbr::inter::[] when (nbr#get_type = Types.String || nbr#get_type = Types.IMultipleInteger || nbr#get_type = Types.IMultipleFloat || nbr#get_type = Types.RealFloat || nbr#get_type = Types.RealInteger)
                          && (inter#get_type = Types.Symbole && inter#get_content = "?") -> Some(fbeg#get_content, variable_name#get_content,
-                           if nbr#get_type = String then Entity.Variable(nbr#get_content) else (create_elem_from_lex_nbr nbr))
+                                                                                                if nbr#get_type = String then Entity.Variable(nbr#get_content) else (create_elem_from_lex_nbr nbr))
       | _ -> None
     )
   | _ -> None
@@ -181,11 +181,11 @@ let parser lexemes =
       match is_equation_solving lvalue rvalue with
       | Some (fname, unknown_name, value) -> Entity.EquationSolving(fname, unknown_name, value)
       | None ->
-      match is_function_definition lvalue rvalue with
-      | Some (function_name, variable_name) -> Entity.FunctionDefinition (function_name, variable_name, polonaise_me rvalue)
-      | None ->
-        match is_variable_definition lvalue rvalue with
-        | Some (variable_name) -> Entity.VariableDefinition(variable_name, polonaise_me rvalue)
-        | None ->  raise (Types.Parser_error "Not yet handled")
+        match is_function_definition lvalue rvalue with
+        | Some (function_name, variable_name) -> Entity.FunctionDefinition (function_name, variable_name, polonaise_me rvalue)
+        | None ->
+          match is_variable_definition lvalue rvalue with
+          | Some (variable_name) -> Entity.VariableDefinition(variable_name, polonaise_me rvalue)
+          | None ->  raise (Types.Parser_error "Not yet handled")
 (* let (r, l) = (polonaise_me lvalue,  rvalue) in
    Utils.print_entity_lst r *)
